@@ -6,15 +6,15 @@ import '../../plugins/plugins.dart';
 import '../itemdetails/itemdetails.dart';
 import '../../staticdata/langcontainer/langcontainer.dart';
 
-class ItemDetails extends StatefulWidget {
+class ItemList extends StatefulWidget {
   final ScreenObj scrObj;
 
-  ItemDetails(this.scrObj);
+  ItemList(this.scrObj);
   @override
-  _ItemDetailsdState createState() => _ItemDetailsdState();
+  _ItemListdState createState() => _ItemListdState();
 }
 
-class _ItemDetailsdState extends State<ItemDetails> {
+class _ItemListdState extends State<ItemList> {
   Map<dynamic, dynamic> item = {};
   List<Map<String, dynamic>> itemArr = [];
 
@@ -65,7 +65,7 @@ class _ItemDetailsdState extends State<ItemDetails> {
   fetchItemDetails(ctx, index) {
     if (itemArr.length > 0) {
       Map<String, dynamic> itemdetails = itemArr[index];
-      this.widget.scrObj.misc["custid"] = itemdetails["id"];
+      this.widget.scrObj.misc["itemid"] = itemdetails["id"];
       Navigator.push(ctx, MaterialPageRoute(builder: (context) {
         return ItemDetails(this.widget.scrObj);
       }));
@@ -79,7 +79,9 @@ class _ItemDetailsdState extends State<ItemDetails> {
           shrinkWrap: true,
           itemBuilder: (ctx, i) {
             return GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  fetchItemDetails(context,i);
+                },
                 child: Card(
                   margin:
                       EdgeInsets.only(top: 1, bottom: 1, left: 10, right: 10),

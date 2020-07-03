@@ -46,7 +46,7 @@ class _DashboardState extends State<Dashboard> {
     } else if (scrrScreen == "Place Order") {
       screen = PlaceOrder(widget.scrObj);
     } else if (scrrScreen == "Item Details") {
-      screen = ItemDetails(widget.scrObj);
+      screen = ItemList(widget.scrObj);
     }
     if (!options[index]['disabled']) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {

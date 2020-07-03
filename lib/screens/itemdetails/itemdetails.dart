@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../dao/screenobj.dart';
+
 import '../../plugins/plugins.dart';
 import '../../staticdata/langcontainer/langcontainer.dart';
 
@@ -14,20 +15,20 @@ class ItemDetails extends StatefulWidget {
 
 class _ItemDetailsdState extends State<ItemDetails> {
 
-  Map<dynamic,dynamic> cust = {};
+  Map<dynamic,dynamic> itemData = {};
   @override
   void initState() {
     fetchItemData();
     super.initState();
   }
   fetchItemData() async{
-    String item = this.widget.scrObj.misc["custid"];
+    String item = this.widget.scrObj.misc["itemid"];
      Map<String, dynamic> rslt = await Plugins.instance
-        .excecute({'reqId': 'SQL', 'query': 'SELECT * FROM TB_ITEM WHERE id like $item'});
+        .excecute({'reqId': 'SQL', 'query': 'SELECT * FROM TB_ITEMS WHERE id like $item'});
     if (rslt['status']) {
       print(rslt['resp']);
       setState(() {
-        cust = rslt['resp'][0];
+        itemData = rslt['resp'][0];
       });
     }
   }
@@ -58,8 +59,8 @@ class _ItemDetailsdState extends State<ItemDetails> {
           child: Container(
             child: Column(
               children: <Widget>[
-                Text(cust["custName"] == null ? "" : cust["custName"]),
-                Text(cust["address"] == null ? "" : cust["address"])
+                Text(itemData["itemname"] == null ? "" : itemData["itemname"]),
+                Text(itemData["power"] == null ? "" : itemData["power"])
               ],
             ),
           )),
