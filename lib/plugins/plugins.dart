@@ -5,6 +5,7 @@ import './ToastMessage.dart';
 import './biometric.dart';
 import './scheduler.dart';
 import './formatdate.dart';
+import './servercall.dart';
 
 class Plugins {
   Plugins._privateConstructor();
@@ -41,6 +42,10 @@ class Plugins {
         String frmt  = req['frmt'];
         DateTime date  = req['date'];
         respObj = await FormatDate.instance.formatDate(date,frmt);
+        finalresp = formSuccessResponse(respObj);
+      }else if (reqId.toString() == CALLSERVER) {
+        Map<String,dynamic> data  = req['data'];
+        respObj = await Server.instance.callserver(data);
         finalresp = formSuccessResponse(respObj);
       }
     } on PluginException catch (e) {

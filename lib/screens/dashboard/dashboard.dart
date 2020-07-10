@@ -63,6 +63,15 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  fetchItems() async {
+    var data = {
+      "datahdr": {"userid": "vignesh", "appid": "test", "sessionid": ""},
+      "requestDetails": {"requestId": "FETCH_ITEMS"},
+      "requestData": {"userid": "vignesh", "pin": "1234"}
+    };
+    await Plugins.instance.excecute({'reqId': "CALLSERVER", 'data': data});
+  }
+
   runScheduler() async {
     var now = new DateTime.now();
     var resp = await Plugins.instance
@@ -105,7 +114,15 @@ class _DashboardState extends State<Dashboard> {
               child: Row(
                 children: <Widget>[
                   Column(
-                    children: <Widget>[Text(time)],
+                    children: <Widget>[
+                      //Text(time),
+                      FlatButton(
+                        onPressed: () {
+                          fetchItems();
+                        },
+                        child: Text("Sync"),
+                      )
+                    ],
                   )
                 ],
               ),
@@ -114,6 +131,7 @@ class _DashboardState extends State<Dashboard> {
         ),
         body: Container(
             width: double.infinity,
+            height: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
                   image: AssetImage("assets/images/shopfx.jpeg"),

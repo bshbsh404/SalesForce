@@ -111,6 +111,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
       return Container();
     } else {
       return ListView.builder(
+        padding: EdgeInsets.all(0),
         shrinkWrap: true,
         itemBuilder: (ctx, i) {
           return GestureDetector(
@@ -118,7 +119,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                 selectItem(i);
               },
               child: Card(
-                margin: EdgeInsets.only(top: 1, bottom: 1, left: 10, right: 10),
+                margin: EdgeInsets.only(top: 1, bottom: 1, left: 1, right: 1),
                 child: Row(
                   children: <Widget>[
                     Container(
@@ -166,27 +167,27 @@ class _PlaceOrderState extends State<PlaceOrder> {
       }
     }
   }
-  getAppbar(){
-    return AppBar(
-          title: Text(
-            langData["LN_LOGIN"][widget.scrObj.lang],
-            style: TextStyle(fontFamily: "Catamaran"),
-          ),
-          actions: <Widget>[
-            Container(
-              padding: EdgeInsets.only(top: 15),
-              child: Row(
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[],
-                  )
-                ],
-              ),
-            ),
-          ],
-        );
-  }
 
+  getAppbar() {
+    return AppBar(
+      title: Text(
+        langData["LN_LOGIN"][widget.scrObj.lang],
+        style: TextStyle(fontFamily: "Catamaran"),
+      ),
+      actions: <Widget>[
+        Container(
+          padding: EdgeInsets.only(top: 15),
+          child: Row(
+            children: <Widget>[
+              Column(
+                children: <Widget>[],
+              )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,12 +214,17 @@ class _PlaceOrderState extends State<PlaceOrder> {
                   children: <Widget>[
                     showRtlrData(),
                     Container(
-                      margin: EdgeInsets.only(top: 30),
+                      margin: EdgeInsets.only(top: 22),
                       padding: EdgeInsets.all(2),
                       child: TextField(
                         focusNode: myFocusNode,
-                        decoration: InputDecoration(
-                          labelText: "Search Item"
+                        decoration: new InputDecoration(
+                          fillColor: Theme.of(context).primaryColorLight,
+                          border: InputBorder.none,
+                          filled: true,
+                          contentPadding: EdgeInsets.only(
+                              bottom: 10.0, left: 10.0, right: 10.0),
+                          labelText: "Search Item",
                         ),
                         controller: srch,
                         onTap: () {
@@ -230,7 +236,20 @@ class _PlaceOrderState extends State<PlaceOrder> {
                         },
                       ),
                     ),
-                    showsrchrslt(),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.deepPurpleAccent[100],
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.deepPurple[50],
+                          ],
+                        ),
+                      ),
+                      child: showsrchrslt(),
+                    ),
                     Container(
                       child: showAddedItms(),
                     )

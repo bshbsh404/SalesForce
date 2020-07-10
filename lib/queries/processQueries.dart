@@ -30,16 +30,42 @@ class ProcessQueries {
     createRecords();
   }
 
-  createRecords() async{
+  createRecords() async {
     if (mockData) {
       await createMockdata(custList);
       await createMockdata(stocks);
       await createMockdata(items);
+    } else {
+      var rtlrdata = {
+        "datahdr": {"userid": "vignesh", "appid": "test", "sessionid": ""},
+        "requestDetails": {"requestId": "FETCH_RTLR"},
+        "requestData": {"userid": "vignesh", "pin": "1234"}
+      };
+      Map<String, dynamic> cust =
+          await Plugins.instance.excecute({'reqId': "CALLSERVER", 'data': rtlrdata});     
+      print("creatingdata");     
+       Map<String, dynamic> custdata = cust["resp"]["finalresp"];
+      await createMockdata(custdata);
+
+      var itemdata = {
+        "datahdr": {"userid": "vignesh", "appid": "test", "sessionid": ""},
+        "requestDetails": {"requestId": "FETCH_ITEMS"},
+        "requestData": {"userid": "vignesh", "pin": "1234"}
+      };
+      Map<String, dynamic> item =
+          await Plugins.instance.excecute({'reqId': "CALLSERVER", 'data': itemdata});
+      Map<String, dynamic> litemdata = item["resp"]["finalresp"];
+      await createMockdata(litemdata);
     }
   }
 
-  createMockdata(tbdata) async {
+  createMockdata(Map<String, dynamic> ltbdata) async {
+    print("tbdata" + ltbdata.toString());
+    Map<String, dynamic> tbdata = ltbdata["resp"];
+
+    print("ltddata " + tbdata.toString());
     //drop the exsisting temp table
+    print( tbdata["name"]);
     String tbName = tbdata["name"] + "_TEMP";
     String dropQuery = dropTable(tbName);
     if (dropQuery != "") {
@@ -53,6 +79,7 @@ class ProcessQueries {
     if (createQuery != "") {
       await Plugins.instance.excecute({'reqId': SQL, 'query': createQuery});
       //inerting data into temp table
+      print("created table");
       String insertQuery = forminsertQuery(tbdata);
       print(insertQuery.toString());
       if (insertQuery != "") {
@@ -66,21 +93,22 @@ class ProcessQueries {
         }
         //renaming temp table to actual table name
         String tbrName = act + "_TEMP";
-
+        print("renaming table");
         String renameQuery = renameTable(tbrName, act);
         if (renameQuery != "") {
           await Plugins.instance.excecute({'reqId': SQL, 'query': renameQuery});
         }
         String fetchcountQuerysql = fetchcountQuery(act);
         if (fetchcountQuerysql != "") {
-          var rslt = await Plugins.instance.excecute({'reqId': SQL, 'query': fetchcountQuerysql});
+          var rslt = await Plugins.instance
+              .excecute({'reqId': SQL, 'query': fetchcountQuerysql});
           print(rslt.toString());
         }
       }
     }
   }
 
-  String fetchcountQuery(table){
+  String fetchcountQuery(table) {
     return "SELECT COUNT(*) FROM $table";
   }
 
@@ -97,7 +125,7 @@ class ProcessQueries {
     print("rename table " + totbName);
     String renameQuery = "";
     if (tbName != "") {
-      renameQuery = " ALTER TABLE $tbName RENAME TO $totbName";  
+      renameQuery = " ALTER TABLE $tbName RENAME TO $totbName";
     }
     return renameQuery;
   }
@@ -130,6 +158,7 @@ class ProcessQueries {
 formalterQuery(val) {}
 
 String forminsertQuery(queryData) {
+  print("Insert data into table");
   String finalQuery = "";
   if (queryData["columns"].length > 0 && queryData["values"].length > 0) {
     finalQuery = "INSERT INTO ${queryData["name"]} (";
@@ -143,7 +172,8 @@ String forminsertQuery(queryData) {
     for (int j = 0; j < queryData["values"].length; j++) {
       for (int k = 0; k < queryData["values"][j].length; k++) {
         finalQuery += "'";
-        finalQuery += queryData["values"][j][k] == null ? "" :  queryData["values"][j][k];
+        finalQuery +=
+            queryData["values"][j][k].toString() == null ? "" : queryData["values"][j][k].toString();
         if (k == queryData["values"][j].length - 1) {
           finalQuery += "'),(";
         } else {
