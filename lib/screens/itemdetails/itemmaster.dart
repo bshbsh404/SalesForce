@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../dao/screenobj.dart';
 import '../../plugins/plugins.dart';
 
-import '../itemdetails/itemdetails.dart';
 import '../../staticdata/langcontainer/langcontainer.dart';
 
 class ItemList extends StatefulWidget {
@@ -66,9 +65,8 @@ class _ItemListdState extends State<ItemList> {
     if (itemArr.length > 0) {
       Map<String, dynamic> itemdetails = itemArr[index];
       this.widget.scrObj.misc["itemid"] = itemdetails["id"];
-      Navigator.push(ctx, MaterialPageRoute(builder: (context) {
-        return ItemDetails(this.widget.scrObj);
-      }));
+      Navigator.of(context)
+          .pushNamed('/itemdtls', arguments: this.widget.scrObj);
     }
   }
 
@@ -80,7 +78,7 @@ class _ItemListdState extends State<ItemList> {
           itemBuilder: (ctx, i) {
             return GestureDetector(
                 onTap: () {
-                  fetchItemDetails(context,i);
+                  fetchItemDetails(context, i);
                 },
                 child: Card(
                   margin:

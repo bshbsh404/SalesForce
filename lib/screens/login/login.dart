@@ -50,10 +50,9 @@ class _LoginState extends State<Login> {
     }
 
     if (validuser && usrrslt['status'] != false) {
-      final scrObj = ScreenObj(userCntrllr.text.trim(), widget.scrObj.lang,{});
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-        return Dashboard(scrObj);
-      }));
+      final scrObj = ScreenObj(userCntrllr.text.trim(), widget.scrObj.lang, {});
+      Navigator.of(context)
+          .pushNamed('/dashboard', arguments: this.widget.scrObj);
     } else {}
   }
 
@@ -62,8 +61,8 @@ class _LoginState extends State<Login> {
         await Plugins.instance.excecute({"reqId": "BIOAUTH"});
 
     if (rslt['status'] && rslt['resp']['status']) {
-      final scrObj = ScreenObj(userCntrllr.text.trim(), widget.scrObj.lang,{});
-       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      final scrObj = ScreenObj(userCntrllr.text.trim(), widget.scrObj.lang, {});
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return Dashboard(scrObj);
       }));
     }
@@ -87,7 +86,7 @@ class _LoginState extends State<Login> {
       alignment: Alignment.center,
       child: Text(
         "Hi " + userId,
-        style:Theme.of(context).textTheme.bodyText2,
+        style: Theme.of(context).textTheme.bodyText2,
       ),
     );
   }
@@ -209,9 +208,8 @@ class _LoginState extends State<Login> {
                               validateUser();
                             },
                             child: Text(
-                              langData["LN_LOGIN"][widget.scrObj.lang],
-                              style: Theme.of(context).textTheme.bodyText1
-                            ),
+                                langData["LN_LOGIN"][widget.scrObj.lang],
+                                style: Theme.of(context).textTheme.bodyText1),
                           ),
                         ),
                         isBioauthEnabled ? getBioAUthenabled() : Text(""),

@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import '../../dao/screenobj.dart';
 import '../../plugins/plugins.dart';
 
-import '../custdetails/custList.dart';
-import '../settings/settings.dart';
-import '../placeorder/order.dart';
-
-import '../itemdetails/itemmaster.dart';
 import '../../staticdata/langcontainer/langcontainer.dart';
 
 class Dashboard extends StatefulWidget {
@@ -38,20 +33,18 @@ class _DashboardState extends State<Dashboard> {
   listclicked(index) {
     //Plugins.instance.excecute({"reqId":"TOAST","msg":options[index]['option']});
     String scrrScreen = options[index]['option'];
-    Widget screen = Dashboard(widget.scrObj);
+    String screen = '/dashboard';
     if (scrrScreen == "Settings") {
-      screen = Settings(widget.scrObj);
+      screen = '/settings';
     } else if (scrrScreen == "Cust Details") {
-      screen = CustomerList(widget.scrObj);
+      screen = '/custmstr';
     } else if (scrrScreen == "Place Order") {
-      screen = PlaceOrder(widget.scrObj);
+      screen = '/custorder';
     } else if (scrrScreen == "Item Details") {
-      screen = ItemList(widget.scrObj);
+      screen = '/itemmstr';
     }
     if (!options[index]['disabled']) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return screen;
-      }));
+      Navigator.of(context).pushNamed(screen, arguments: this.widget.scrObj);
     }
   }
 
@@ -116,12 +109,6 @@ class _DashboardState extends State<Dashboard> {
                   Column(
                     children: <Widget>[
                       //Text(time),
-                      FlatButton(
-                        onPressed: () {
-                          fetchItems();
-                        },
-                        child: Text("Sync"),
-                      )
                     ],
                   )
                 ],

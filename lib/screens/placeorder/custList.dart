@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 import '../../dao/screenobj.dart';
 import '../../staticdata/langcontainer/langcontainer.dart';
 import '../../plugins/plugins.dart';
+import './order.dart';
 
-class CustomerList extends StatefulWidget {
+class CustomerListor extends StatefulWidget {
   final ScreenObj scrObj;
 
-  CustomerList(this.scrObj);
+  CustomerListor(this.scrObj);
 
   @override
-  _CustomerListState createState() => _CustomerListState();
+  _CustomerListorState createState() => _CustomerListorState();
 }
 
-class _CustomerListState extends State<CustomerList> {
+class _CustomerListorState extends State<CustomerListor> {
   List<Map<String, dynamic>> custArr = [];
 
   getCustlist() async {
@@ -31,8 +32,7 @@ class _CustomerListState extends State<CustomerList> {
     if (custArr.length > 0) {
       Map<String, dynamic> custdetails = custArr[index];
       this.widget.scrObj.misc["custid"] = custdetails["id"];
-      Navigator.of(context)
-          .pushNamed('/custdtls', arguments: this.widget.scrObj);
+      Navigator.of(context).pushNamed('/order', arguments: this.widget.scrObj);
     }
   }
 

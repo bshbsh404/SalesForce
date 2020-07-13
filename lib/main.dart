@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
+import './plugins/plugins.dart';
+
 import './dao/screenobj.dart';
 import './staticdata/langcontainer/langcontainer.dart';
 import './screens/login/login.dart';
 import './Queries/processQueries.dart';
 
 import './themes/themechanger.dart';
+
+import './screens/route_generator.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,20 +22,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ThemeNotifier(),
-          child: Consumer<ThemeNotifier>(
-            builder: (context, ThemeNotifier notifier, child) {
-
-              return      MaterialApp(
-              title: 'Flutter Theme Provider',
-              theme: notifier.darkTheme ? dark : light,
-              home: MyHomePage(),
-            );
-            } ,
-          ),
+      child: Consumer<ThemeNotifier>(
+        builder: (context, ThemeNotifier notifier, child) {
+          return MaterialApp(
+            title: 'Flutter Theme Provider',
+            theme: notifier.darkTheme ? dark : light,
+            initialRoute: '/',
+            onGenerateRoute: RouteGenerator.generateRoute,
+          );
+        },
+      ),
     );
   }
 }
-
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -55,9 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
   launchLogin(context) {
     final ScreenObj sccrobj = ScreenObj("", lang, {});
     setState(() {});
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return Login(sccrobj);
-    }));
+    Navigator.of(context).pushNamed('/login', arguments: sccrobj);
   }
 
   List images = [
@@ -67,6 +68,22 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   checkTablePresent() async {
     await ProcessQueries().checktablePresent();
+  }
+
+  checkUser(context) async {
+    Map<String, dynamic> usrrslt = await Plugins.instance.excecute({
+      'reqId': "SQL",
+      'query': 'SELECT * FROM TB_USERS',
+      'entity': "Customer"
+    });
+    if (usrrslt['status'] != false && usrrslt['resp'].length > 0) {
+      launchLogin(context);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
@@ -165,7 +182,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                   color: Theme.of(context).primaryColor,
                                   child: Text(
                                     langData["LN_PROCD_SF"][lang],
-                                    style: Theme.of(context).textTheme.bodyText1,
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1,
                                   ),
                                 ),
                               ],

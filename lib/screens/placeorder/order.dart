@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import '../../plugins/plugins.dart';
 import '../../dao/screenobj.dart';
@@ -17,6 +18,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
   final srch = TextEditingController();
   List<Map<dynamic, dynamic>> items = [];
   List<Map<dynamic, dynamic>> srchitems = [];
+  Map<dynamic, dynamic> cust = {};
+
   bool srchmode = false;
   submitData(context) {}
 
@@ -25,6 +28,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
   @override
   void initState() {
     super.initState();
+    fetchCust();
     myFocusNode = FocusNode();
   }
 
@@ -51,18 +55,37 @@ class _PlaceOrderState extends State<PlaceOrder> {
     });
   }
 
+  fetchCust() async {
+    String custid = this.widget.scrObj.misc["custid"];
+    Map<String, dynamic> rslt = await Plugins.instance.excecute({
+      'reqId': 'SQL',
+      'query': 'SELECT * FROM TB_CUST WHERE id like $custid'
+    });
+    if (rslt['status']) {
+      print(rslt['resp']);
+      setState(() {
+        cust = rslt['resp'][0];
+      });
+    }
+  }
+
   showRtlrData() {
     if (srchmode) {
       return Container();
     } else {
       return Container(
+        margin: EdgeInsets.only(left:10,right:10),
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Colors.white
+        ),
         child: Column(
           children: <Widget>[
             Row(
-              children: <Widget>[Text("Name"), Text("Addr")],
+              children: <Widget>[Text(cust["custName"]), Text(cust["address"])],
             ),
             Container(
-              child: Text("Route"),
+              child: Text(cust["address"]),
             )
           ],
         ),
@@ -75,6 +98,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
       return Container();
     } else if (items.length > 0) {
       return ListView.builder(
+        padding: EdgeInsets.all(0),
         shrinkWrap: true,
         itemBuilder: (ctx, i) {
           return GestureDetector(
@@ -84,15 +108,16 @@ class _PlaceOrderState extends State<PlaceOrder> {
                 child: Row(
                   children: <Widget>[
                     Container(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(items[i]["itemname"],
-                                style: Theme.of(context).textTheme.bodyText2),
-                            Text(items[i]["power"])
-                          ],
-                        )),
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(items[i]["itemname"],
+                              style: Theme.of(context).textTheme.bodyText2),
+                          Text(items[i]["power"])
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ));
@@ -110,45 +135,109 @@ class _PlaceOrderState extends State<PlaceOrder> {
     if (!srchmode) {
       return Container();
     } else {
-      return ListView.builder(
-        padding: EdgeInsets.all(0),
-        shrinkWrap: true,
-        itemBuilder: (ctx, i) {
-          return GestureDetector(
-              onTap: () {
-                selectItem(i);
-              },
-              child: Card(
-                margin: EdgeInsets.only(top: 1, bottom: 1, left: 1, right: 1),
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(srchitems[i]["itemname"],
-                                style: Theme.of(context).textTheme.bodyText2),
-                            Text(srchitems[i]["power"])
-                          ],
-                        )),
-                  ],
-                ),
-              ));
-        },
-        itemCount: srchitems.length,
+      return Expanded(
+        child: ListView.builder(
+          padding: EdgeInsets.all(0),
+          shrinkWrap: true,
+          itemBuilder: (ctx, i) {
+            return GestureDetector(
+                onTap: () {
+                  selectItem(i);
+                },
+                child: Card(
+                  margin: EdgeInsets.only(top: 1, bottom: 1, left: 1, right: 1),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(srchitems[i]["itemname"],
+                                  style: Theme.of(context).textTheme.bodyText2),
+                              Text(srchitems[i]["power"])
+                            ],
+                          )),
+                    ],
+                  ),
+                ));
+          },
+          itemCount: srchitems.length,
+        ),
       );
     }
   }
 
   selectItem(index) {
     Map<dynamic, dynamic> srchitm = srchitems[index];
-    setState(() {
-      items.add(srchitm);
-      srchmode = false;
-    });
-    srch.clear();
     myFocusNode.unfocus();
+    srch.clear();
+    Timer(const Duration(milliseconds: 200), () {
+      setState(() {
+        items.add(srchitm);
+        srchmode = false;
+      });
+    });
+  }
+
+  continueBtn(context) {
+    if (srchmode) {
+      return Container();
+    } else {
+      return Container(
+        height: 70,
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.brown[100],
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              left: 10, right: 10, top: 5, bottom: 5),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Theme.of(context).primaryColor),
+                              color: Colors.brown[50]),
+                          child: FlatButton(
+                            onPressed: () {},
+                            child: Text("Continue"),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              left: 10, right: 10, top: 5, bottom: 5),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          child: FlatButton(
+                            onPressed: () {},
+                            child: Text(
+                              "Continue",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   searchItem(val) async {
@@ -196,8 +285,6 @@ class _PlaceOrderState extends State<PlaceOrder> {
       child: Scaffold(
         appBar: srchmode ? null : getAppbar(),
         body: Container(
-          width: double.infinity,
-          height: double.infinity,
           decoration: BoxDecoration(
             image: DecorationImage(
                 image: AssetImage("assets/images/shopfx.jpeg"),
@@ -205,59 +292,42 @@ class _PlaceOrderState extends State<PlaceOrder> {
                 colorFilter: ColorFilter.mode(
                     Color.fromRGBO(255, 255, 255, 0.3), BlendMode.modulate)),
           ),
-          child: SingleChildScrollView(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
             children: <Widget>[
+              showRtlrData(),
               Container(
-                child: Column(
-                  children: <Widget>[
-                    showRtlrData(),
-                    Container(
-                      margin: EdgeInsets.only(top: 22),
-                      padding: EdgeInsets.all(2),
-                      child: TextField(
-                        focusNode: myFocusNode,
-                        decoration: new InputDecoration(
-                          fillColor: Theme.of(context).primaryColorLight,
-                          border: InputBorder.none,
-                          filled: true,
-                          contentPadding: EdgeInsets.only(
-                              bottom: 10.0, left: 10.0, right: 10.0),
-                          labelText: "Search Item",
-                        ),
-                        controller: srch,
-                        onTap: () {
-                          lauchSearchMode();
-                        },
-                        onSubmitted: (_) => submitData(context),
-                        onChanged: (val) {
-                          searchItem(val);
-                        },
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.deepPurpleAccent[100],
-                            Colors.transparent,
-                            Colors.transparent,
-                            Colors.transparent,
-                            Colors.deepPurple[50],
-                          ],
-                        ),
-                      ),
-                      child: showsrchrslt(),
-                    ),
-                    Container(
-                      child: showAddedItms(),
-                    )
-                  ],
+                margin:
+                    EdgeInsets.only(top: 22, bottom: 1, left: 10, right: 10),
+                padding: EdgeInsets.all(2),
+                child: TextField(
+                  focusNode: myFocusNode,
+                  decoration: new InputDecoration(
+                    fillColor: Theme.of(context).primaryColorLight,
+                    border: InputBorder.none,
+                    filled: true,
+                    contentPadding:
+                        EdgeInsets.only(bottom: 10.0, left: 10.0, right: 10.0),
+                    labelText: "Search Item",
+                  ),
+                  controller: srch,
+                  onTap: () {
+                    lauchSearchMode();
+                  },
+                  onSubmitted: (_) => submitData(context),
+                  onChanged: (val) {
+                    searchItem(val);
+                  },
                 ),
               ),
+              showsrchrslt(),
+              srchmode
+                  ? Text("")
+                  : Expanded(
+                      child: showAddedItms(),
+                    ),
+              continueBtn(context),
             ],
-          )),
+          ),
         ),
       ),
     );
