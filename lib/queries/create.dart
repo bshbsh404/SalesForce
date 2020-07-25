@@ -39,5 +39,17 @@ Map create = {
     'columns': [],
     'types': [],
     'version': 1
+  },'tborder': {
+    'name': 'TB_ORDER',
+    'pk': [],
+    'columns': ["userid","custid","payload","ordertime","pushstatus","orderhash",],
+    'types': [
+      'VARCHAR(45)',
+      'VARCHAR',
+      'VARCHAR(45)',
+      'VARCHAR(45)',
+      'VARCHAR(45)',
+      'VARCHAR(45)'],
+    'version': 1
   },
 };

@@ -6,7 +6,6 @@ import './plugins/plugins.dart';
 
 import './dao/screenobj.dart';
 import './staticdata/langcontainer/langcontainer.dart';
-import './screens/login/login.dart';
 import './Queries/processQueries.dart';
 
 import './themes/themechanger.dart';
@@ -18,16 +17,27 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  bool userPresent = false;
+  checkUser() async {
+    Map<String, dynamic> usrrslt = await Plugins.instance.excecute({
+      'reqId': "SQL",
+      'query': 'SELECT * FROM TB_USERS',
+      'entity': "Customer"
+    });
+    if (usrrslt['status'] != false && usrrslt['resp'].length > 0) {
+     userPresent = true;
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return ChangeNotifierProvider(
       create: (_) => ThemeNotifier(),
       child: Consumer<ThemeNotifier>(
         builder: (context, ThemeNotifier notifier, child) {
           return MaterialApp(
-            title: 'Flutter Theme Provider',
             theme: notifier.darkTheme ? dark : light,
-            initialRoute: '/',
+            initialRoute: userPresent ? '/login': '/',
             onGenerateRoute: RouteGenerator.generateRoute,
           );
         },
@@ -43,6 +53,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String lang = "en_us";
+  bool loggedin = true;
   changeLanguage() {
     String tlang = "en_us";
     if (lang == "en_us") {
@@ -68,6 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   checkTablePresent() async {
     await ProcessQueries().checktablePresent();
+    checkUser(context);
   }
 
   checkUser(context) async {
@@ -78,63 +90,18 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     if (usrrslt['status'] != false && usrrslt['resp'].length > 0) {
       launchLogin(context);
+    }else{
+      setState(() {
+        loggedin = false;
+      });
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    checkTablePresent();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.0), // here the desired height
-          child: AppBar(
-            title: Text(
-              langData["LN_SFORCE"][lang],
-              style: TextStyle(fontFamily: "Roboto", fontSize: 25),
-            ),
-            actions: <Widget>[
-              Container(
-                padding: EdgeInsets.only(top: 15),
-                child: Row(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.all(2),
-                          child: GestureDetector(
-                            onTap: () {
-                              changeLanguage();
-                            },
-                            child: Icon(Icons.translate),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage("assets/images/shopfx.jpeg"),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                    Color.fromRGBO(255, 255, 255, 0.3), BlendMode.modulate)),
-          ),
-          child: Column(
+  loadContainerData(){
+    if(loggedin){
+      return Container();
+    }else{
+      return Column(
             children: <Widget>[
               Swiper(
                 itemBuilder: (BuildContext context, int index) {
@@ -203,7 +170,64 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
+          );
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkTablePresent();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70.0), // here the desired height
+          child: AppBar(
+            title: Text(
+              langData["LN_SFORCE"][lang],
+              style: TextStyle(fontFamily: "Roboto", fontSize: 25),
+            ),
+            actions: <Widget>[
+              Container(
+                padding: EdgeInsets.only(top: 15),
+                child: Row(
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(2),
+                          child: GestureDetector(
+                            onTap: () {
+                              changeLanguage();
+                            },
+                            child: Icon(Icons.translate),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("assets/images/shopfx.jpeg"),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Color.fromRGBO(255, 255, 255, 0.3), BlendMode.modulate)),
+          ),
+          child: loadContainerData(),
         ));
   }
 }

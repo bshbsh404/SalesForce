@@ -25,17 +25,26 @@ class _PlaceOrderState extends State<PlaceOrder> {
 
   FocusNode myFocusNode;
 
+  List<FocusNode> lfocusnode = [];
+
+  List<TextEditingController> _controller = [];
   @override
   void initState() {
     super.initState();
     fetchCust();
     myFocusNode = FocusNode();
+    for (int i = 1; i < 75; i++) lfocusnode.add(FocusNode());
+    for (int i = 1; i < 75; i++) _controller.add(TextEditingController());
   }
 
   @override
   void dispose() {
     // Clean up the focus node when the Form is disposed.
     myFocusNode.dispose();
+    lfocusnode.forEach((element) {
+      element.dispose();
+    });
+    _controller.removeRange(0, _controller.length);
     super.dispose();
   }
 
@@ -46,6 +55,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
       });
     } else {
       Navigator.of(context).pop(true);
+      return true;
     }
   }
 
@@ -74,23 +84,67 @@ class _PlaceOrderState extends State<PlaceOrder> {
       return Container();
     } else {
       return Container(
-        margin: EdgeInsets.only(left:10,right:10),
+        margin: EdgeInsets.only(top: 20, left: 5, right: 5),
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: Colors.white
+          color: Colors.deepPurpleAccent[100],
         ),
-        child: Column(
+        child: Row(
           children: <Widget>[
-            Row(
-              children: <Widget>[Text(cust["custName"]), Text(cust["address"])],
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    cust["custName"] == null ? "" : cust["custName"],
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    cust["address"] == null ? "" : cust["address"],
+                    style: TextStyle(fontSize: 15, color: Colors.white),
+                  ),
+                )
+              ],
             ),
-            Container(
-              child: Text(cust["address"]),
-            )
           ],
         ),
       );
     }
+  }
+
+  removeItem(i) {
+    setState(() {
+      if (int.parse(items[i]["qty"]) > 0) {
+        int lqty = int.parse(items[i]["qty"]) - 1;
+        items[i]["qty"] = lqty.toString();
+        _controller[i].text = items[i]["qty"];
+      }
+    });
+  }
+
+  removeItemfrmlst(i) {
+    setState(() {
+      items.removeAt(i);
+    });
+  }
+
+  addItem(i) {
+    Map<dynamic, dynamic> item = items[i];
+    setState(() {
+      if (item["qty"] != "" && item["qty"] != null) {
+        int lqty = int.parse(item["qty"]) + 1;
+        print("qty" + lqty.toString());
+        item["qty"] = lqty.toString();
+      } else {
+        item["qty"] = "1";
+      }
+      items[i] = item;
+      _controller[i].text = item["qty"];
+    });
   }
 
   showAddedItms() {
@@ -100,69 +154,185 @@ class _PlaceOrderState extends State<PlaceOrder> {
       return ListView.builder(
         padding: EdgeInsets.all(0),
         shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemBuilder: (ctx, i) {
-          return GestureDetector(
-              onTap: () {},
-              child: Card(
-                margin: EdgeInsets.only(top: 1, bottom: 1, left: 10, right: 10),
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(items[i]["itemname"],
-                              style: Theme.of(context).textTheme.bodyText2),
-                          Text(items[i]["power"])
-                        ],
+          return Dismissible(
+            key: Key(i.toString()),
+            onDismissed: (direction) {
+              setState(() {
+                items.removeAt(i);
+              });
+            },
+            child: GestureDetector(
+                onTap: () {},
+                child: Card(
+                  margin: EdgeInsets.only(top: 1, bottom: 1, left: 5, right: 5),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                items[i]["itemname"] == null
+                                    ? ""
+                                    : items[i]["itemname"],
+                                style: TextStyle(
+                                    color: Colors.deepPurple,
+                                    fontSize: 18,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                items[i]["power"] == null
+                                    ? ""
+                                    : items[i]["power"],
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ));
+                      Container(
+                        width: 50,
+                        child: FlatButton(
+                          onPressed: () {
+                            removeItem(i);
+                          },
+                          child: Icon(
+                            Icons.remove,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 40,
+                        width: 40,
+                        child: TextFormField(
+                          controller: _controller[i],
+                          focusNode: lfocusnode[i],
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          onChanged: (text) {
+                            addQtty(text, i);
+                          },
+                        ),
+                      ),
+                      Container(
+                        width: 50,
+                        child: FlatButton(
+                          onPressed: () {
+                            addItem(i);
+                          },
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(0),
+                        margin: EdgeInsets.all(0),
+                        width: 50,
+                        child: GestureDetector(
+                          onTap: () {
+                            removeItemfrmlst(i);
+                          },
+                          child: Icon(
+                            Icons.restore_from_trash,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          );
         },
         itemCount: items.length,
       );
     } else {
       return Container(
-        child: Text("Add Items"),
+        margin: EdgeInsets.all(5),
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.deepPurple),
+        ),
+        child: Center(
+          child: Column(
+            children: <Widget>[
+              IconTheme(
+                data: IconThemeData(
+                  color: Colors.deepPurple,
+                  size: 40,
+                ),
+                child: Icon(Icons.add_shopping_cart),
+              ),
+              Text(
+                "Add Items to cart",
+                style: TextStyle(fontSize: 18, color: Colors.deepPurple),
+              ),
+            ],
+          ),
+        ),
       );
     }
+  }
+
+  addQtty(txt, i) {
+    items[i]["qty"] = txt;
+  }
+
+  continueconfirm() {
+    this.widget.scrObj.misc["items"] = items;
+    Navigator.of(context)
+        .pushNamed('/confrimorder', arguments: this.widget.scrObj);
   }
 
   showsrchrslt() {
     if (!srchmode) {
       return Container();
     } else {
-      return Expanded(
-        child: ListView.builder(
-          padding: EdgeInsets.all(0),
-          shrinkWrap: true,
-          itemBuilder: (ctx, i) {
-            return GestureDetector(
-                onTap: () {
-                  selectItem(i);
-                },
-                child: Card(
-                  margin: EdgeInsets.only(top: 1, bottom: 1, left: 1, right: 1),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                          padding: EdgeInsets.all(10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(srchitems[i]["itemname"],
-                                  style: Theme.of(context).textTheme.bodyText2),
-                              Text(srchitems[i]["power"])
-                            ],
-                          )),
-                    ],
-                  ),
-                ));
-          },
-          itemCount: srchitems.length,
+      return Container(
+        child: Scrollbar(
+          child: ListView.builder(
+            padding: EdgeInsets.all(0),
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (ctx, i) {
+              return GestureDetector(
+                  onTap: () {
+                    selectItem(i);
+                  },
+                  child: Card(
+                    margin:
+                        EdgeInsets.only(top: 1, bottom: 1, left: 1, right: 1),
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                            padding: EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  srchitems[i]["itemname"],
+                                  style: TextStyle(
+                                      color: Colors.deepPurple,
+                                      fontSize: 18,
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(srchitems[i]["power"])
+                              ],
+                            )),
+                      ],
+                    ),
+                  ));
+            },
+            itemCount: srchitems.length,
+          ),
         ),
       );
     }
@@ -170,66 +340,63 @@ class _PlaceOrderState extends State<PlaceOrder> {
 
   selectItem(index) {
     Map<dynamic, dynamic> srchitm = srchitems[index];
+    srchitm = {...srchitm, "qty": "1"};
     myFocusNode.unfocus();
     srch.clear();
-    Timer(const Duration(milliseconds: 200), () {
+
+    Timer(const Duration(milliseconds: 100), () {
       setState(() {
-        items.add(srchitm);
+        items.insert(0, srchitm);
         srchmode = false;
       });
+      int i = 0;
+      items.forEach((element) {
+        _controller[i].text = element['qty'];
+        i++;
+      });
     });
+    lfocusnode[0].requestFocus();
   }
 
   continueBtn(context) {
     if (srchmode) {
-      return Container();
+      return Text("");
     } else {
       return Container(
-        height: 70,
-        child: Column(
+        decoration: BoxDecoration(
+          color: Colors.brown[100],
+        ),
+        child: Row(
           children: <Widget>[
             Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.brown[100],
+              child: Container(
+                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).primaryColor),
+                    color: Colors.brown[50]),
+                child: FlatButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Back",
                   ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(
-                              left: 10, right: 10, top: 5, bottom: 5),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Theme.of(context).primaryColor),
-                              color: Colors.brown[50]),
-                          child: FlatButton(
-                            onPressed: () {},
-                            child: Text("Continue"),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(
-                              left: 10, right: 10, top: 5, bottom: 5),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          child: FlatButton(
-                            onPressed: () {},
-                            child: Text(
-                              "Continue",
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                ),
+                child: FlatButton(
+                  onPressed: () {
+                    continueconfirm();
+                  },
+                  child: Text(
+                    "Continue",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -285,6 +452,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
       child: Scaffold(
         appBar: srchmode ? null : getAppbar(),
         body: Container(
+          height: double.infinity,
+          width: double.infinity,
           decoration: BoxDecoration(
             image: DecorationImage(
                 image: AssetImage("assets/images/shopfx.jpeg"),
@@ -292,43 +461,59 @@ class _PlaceOrderState extends State<PlaceOrder> {
                 colorFilter: ColorFilter.mode(
                     Color.fromRGBO(255, 255, 255, 0.3), BlendMode.modulate)),
           ),
-          child: Column(
-            children: <Widget>[
-              showRtlrData(),
-              Container(
-                margin:
-                    EdgeInsets.only(top: 22, bottom: 1, left: 10, right: 10),
-                padding: EdgeInsets.all(2),
-                child: TextField(
-                  focusNode: myFocusNode,
-                  decoration: new InputDecoration(
-                    fillColor: Theme.of(context).primaryColorLight,
-                    border: InputBorder.none,
-                    filled: true,
-                    contentPadding:
-                        EdgeInsets.only(bottom: 10.0, left: 10.0, right: 10.0),
-                    labelText: "Search Item",
-                  ),
-                  controller: srch,
-                  onTap: () {
-                    lauchSearchMode();
-                  },
-                  onSubmitted: (_) => submitData(context),
-                  onChanged: (val) {
-                    searchItem(val);
-                  },
-                ),
-              ),
-              showsrchrslt(),
-              srchmode
-                  ? Text("")
-                  : Expanded(
-                      child: showAddedItms(),
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                showRtlrData(),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blueGrey),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.deepPurpleAccent[100],
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.deepPurpleAccent[100],
+                      ],
                     ),
-              continueBtn(context),
-            ],
+                  ),
+                  padding:
+                      EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
+                  margin: EdgeInsets.only(
+                    left: 5,
+                    right: 5,
+                    top: 25,
+                  ),
+                  child: TextField(
+                    focusNode: myFocusNode,
+                    decoration: new InputDecoration(
+                      fillColor: Colors.transparent,
+                      filled: true,
+                      contentPadding: EdgeInsets.only(bottom: 10.0, left: 10.0),
+                      labelText: "Search Item",
+                    ),
+                    controller: srch,
+                    onTap: () {
+                      lauchSearchMode();
+                    },
+                    onSubmitted: (_) => submitData(context),
+                    onChanged: (val) {
+                      searchItem(val);
+                    },
+                  ),
+                ),
+                showsrchrslt(),
+                srchmode
+                    ? Text("")
+                    : Container(
+                        child: showAddedItms(),
+                      ),
+              ],
+            ),
           ),
         ),
+        bottomNavigationBar: continueBtn(context),
       ),
     );
   }

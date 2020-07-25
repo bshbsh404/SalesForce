@@ -6,12 +6,15 @@ import '../main.dart';
 import '../screens/login/login.dart';
 import '../screens/placeorder/custList.dart';
 import '../screens/placeorder/order.dart';
+import '../screens/placeorder/confirmorder.dart';
+import '../screens/placeorder/status.dart';
 import '../screens/settings/settings.dart';
 import '../screens/custdetails/custList.dart';
 import '../screens/custdetails/custdetails.dart';
 import '../screens/dashboard/dashboard.dart';
 import '../screens/itemdetails/itemdetails.dart';
 import '../screens/itemdetails/itemmaster.dart';
+
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -70,12 +73,26 @@ class RouteGenerator {
           ),
         );
 
+       case '/confrimorder':
+        return MaterialPageRoute(
+          builder: (_) => ConfirmOrder(
+            args,
+          ),
+        );
       case '/order':
         return MaterialPageRoute(
           builder: (_) => PlaceOrder(
             args,
           ),
         );
+
+       case '/orderstatus':
+        return MaterialPageRoute(
+          builder: (_) => OrderStatus(
+            args,
+          ),
+        );
+
 
       case '/dashboard':
         return MaterialPageRoute(

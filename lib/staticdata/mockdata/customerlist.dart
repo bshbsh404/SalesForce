@@ -1,4 +1,4 @@
-Map custList = {
+Map<String,dynamic> custList = {"resp":{
   "columns": ["id","custName", "address","status"],
   "values": [
     ["1","vignesh retailer", "new bus stand","true"],
@@ -15,8 +15,8 @@ Map custList = {
     'VARCHAR(45)',
     'VARCHAR(45)',
   ]
-};
-Map items = {
+}};
+Map<String,dynamic> items =  {"resp":{
   "columns": ["id","itemname", "power","status"],
   "values": [
     ["1","switch", null,"true"],
@@ -33,8 +33,8 @@ Map items = {
     'VARCHAR(45)',
     'VARCHAR(45)',
   ]
-};
-Map stocks = {
+}};
+Map<String,dynamic> stocks =  {"resp":{
   "columns": ["id","stock","mrp","ptr","schm","status"],
   "values": [
     ["1","10","3","2.3","1.0.0","true"],
@@ -52,8 +52,8 @@ Map stocks = {
     'VARCHAR(45)',
     'VARCHAR(45)',
   ]
-};
-Map outst = {
+}};
+Map<String,dynamic> outst = {"resp": {
   "columns": ["id","stock","mrp","ptr","schm","status"],
   "values": [
     ["1","10","3","2.3","1.0.0","true"],
@@ -71,8 +71,8 @@ Map outst = {
     'VARCHAR(45)',
     'VARCHAR(45)',
   ]
-};
-Map ordrlst = {
+}};
+Map<String,dynamic> ordrlst =  {"resp":{
   "columns": ["id","qty","invno","ordno","status"],
   "values": [
     ["1","10","I001","O001","true"],
@@ -90,4 +90,4 @@ Map ordrlst = {
     'VARCHAR(45)',
     'VARCHAR(45)',
   ]
-};
+}};

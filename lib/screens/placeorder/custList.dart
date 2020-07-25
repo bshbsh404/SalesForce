@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../dao/screenobj.dart';
 import '../../staticdata/langcontainer/langcontainer.dart';
 import '../../plugins/plugins.dart';
-import './order.dart';
 
 class CustomerListor extends StatefulWidget {
   final ScreenObj scrObj;
@@ -26,6 +25,7 @@ class _CustomerListorState extends State<CustomerListor> {
         custArr = rslt['resp'];
       });
     }
+    return true;
   }
 
   fetchcustDetails(ctx, index) {
