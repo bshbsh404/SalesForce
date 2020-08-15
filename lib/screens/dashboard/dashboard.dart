@@ -125,7 +125,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
-    startBackgroundPrcss();
+    //startBackgroundPrcss();
     super.initState();
   }
 

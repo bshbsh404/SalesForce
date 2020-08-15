@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeNotifier>(
         builder: (context, ThemeNotifier notifier, child) {
           return MaterialApp(
-            theme: notifier.darkTheme ? dark : light,
+            theme:  light,
             initialRoute: userPresent ? '/login': '/',
             onGenerateRoute: RouteGenerator.generateRoute,
           );
@@ -124,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
                     fontFamily: "Roboto",
                   ),
                 ),
@@ -188,37 +189,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.0), // here the desired height
-          child: AppBar(
-            title: Text(
-              langData["LN_SFORCE"][lang],
-              style: TextStyle(fontFamily: "Roboto", fontSize: 25),
-            ),
-            actions: <Widget>[
-              Container(
-                padding: EdgeInsets.only(top: 15),
-                child: Row(
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.all(2),
-                          child: GestureDetector(
-                            onTap: () {
-                              changeLanguage();
-                            },
-                            child: Icon(Icons.translate),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
         body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(

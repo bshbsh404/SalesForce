@@ -10,5 +10,11 @@ Map langData = {
   "LN_STNGS": {"en_us": "Settings", "tm": "அமைப்புகள்"},
   "LN_USER_NM": {"en_us": "User Name", "tm": "பயனர் பெயர்"},
   "LN_PASS": {"en_us": "Password", "tm": "கடவுச்சொல்"},
+  "LN_USER_ID": {"en_us": "User Id", "tm": "கடவுச்சொல்"},
+  "LN_NICK_NAME": {"en_us": "Nick name", "tm": "கடவுச்சொல்"},
+  
+  
+
+
 
 };
